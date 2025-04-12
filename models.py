@@ -1312,7 +1312,8 @@ class UNetDEMConditionModel(
                 **additional_residuals,
             )
         else:
-            sample_dem, res_samples_dem = self.head_img(hidden_states=sample, temb=emb)
+            # sample_dem, res_samples_dem = self.head_dem(hidden_states=sample, temb=emb)
+            sample_dem, res_samples_dem = self.head_img(hidden_states=sample, temb=emb) # shared weights
         
         head_dem_res_sample += res_samples_dem[:2]
 

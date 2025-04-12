@@ -1,0 +1,5 @@
+diffusers
+transformers
+accelerate
+torch --index-url https://download.pytorch.org/whl/cu124
+

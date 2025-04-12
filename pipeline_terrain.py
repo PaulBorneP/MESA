@@ -554,19 +554,6 @@ class TerrainDiffusionPipeline(
 
         return ip_adapter_image_embeds
 
-    def run_safety_checker(self, image, device, dtype):
-        if self.safety_checker is None:
-            has_nsfw_concept = None
-        else:
-            if torch.is_tensor(image):
-                feature_extractor_input = self.image_processor.postprocess(image, output_type="pil")
-            else:
-                feature_extractor_input = self.image_processor.numpy_to_pil(image)
-            safety_checker_input = self.feature_extractor(feature_extractor_input, return_tensors="pt").to(device)
-            image, has_nsfw_concept = self.safety_checker(
-                images=image, clip_input=safety_checker_input.pixel_values.to(dtype)
-            )
-        return image, has_nsfw_concept
 
     def decode_latents(self, latents):
         deprecation_message = "The decode_latents method is deprecated and will be removed in 1.0.0. Please use VaeImageProcessor.postprocess(...) instead"
@@ -749,7 +736,7 @@ class TerrainDiffusionPipeline(
     def interrupt(self):
         return self._interrupt
     
-    def decode_rgbd(self, latents,generator,output_type="pil"):
+    def decode_rgbd(self, latents,generator,output_type="np"):
         dem_latents = latents[:,4:,:,:]
         img_latents = latents[:,:4,:,:]
         image = self.vae.decode(img_latents / self.vae.config.scaling_factor, return_dict=False, generator=generator)[
@@ -783,7 +770,7 @@ class TerrainDiffusionPipeline(
         negative_prompt_embeds: Optional[torch.Tensor] = None,
         ip_adapter_image: Optional[PipelineImageInput] = None,
         ip_adapter_image_embeds: Optional[List[torch.Tensor]] = None,
-        output_type: Optional[str] = "pil",
+        output_type: Optional[str] = "np",
         return_dict: bool = True,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None,
         guidance_rescale: float = 0.0,
@@ -1005,7 +992,7 @@ class TerrainDiffusionPipeline(
         # 7. Denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
-        intermediate_latents = []
+#        intermediate_latents = []
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
@@ -1038,8 +1025,8 @@ class TerrainDiffusionPipeline(
                 # compute the previous noisy sample x_t -> x_t-1
                 scheduler_output = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=True)
                 latents = scheduler_output.prev_sample
-                if i % 10 == 0:
-                    intermediate_latents.append(scheduler_output.pred_original_sample)
+#                if i % 10 == 0:
+#                   intermediate_latents.append(scheduler_output.pred_original_sample)
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
                     for k in callback_on_step_end_tensor_inputs:
@@ -1062,9 +1049,9 @@ class TerrainDiffusionPipeline(
 
         image,dem = self.decode_rgbd(latents,generator,output_type)
 
-        intermediate = [self.decode_rgbd(latent,generator,output_type)for latent in intermediate_latents]
+     #   intermediate = [self.decode_rgbd(latent,generator,output_type)for latent in intermediate_latents]
 
         # Offload all models
         self.maybe_free_model_hooks()
 
-        return image,dem, intermediate
+        return image,dem
