@@ -11,8 +11,7 @@
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://www.huggingface.co/NewtNewt/MESA)
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Datasets-yellow)](https://www.huggingface.co/Major-TOM) 
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Spaces_Demo-yellow)]()
- <a href="" target="_parent">
-<img src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" alt="Open In Colab"/></a> 
+ <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
 
 
 MESA is a novel generative model based on latent denoising diffusion capable of generating 2.5D representations of terrain based on the text prompt conditioning supplied via natural language. The model produces two co-registered modalities of optical and depth maps.
@@ -39,8 +38,7 @@ conda activate mesa
 
 Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of xxGB of memory.
 ## Inference
-A straightforward code for inference is provided in  <img src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" alt="Open In Colab"/></a> 
-
+A straightforward code for inference is provided in  <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
 Alternatively you can use the Gradio demo.
 When you run the inference scripts, gradio demos will be hosted on your local machine. You can access the demos by opening the URLs (shown in the terminal) in your browser.
 
