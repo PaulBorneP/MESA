@@ -37,7 +37,7 @@ cd MESA
 pip install -r requirements.txt
 ```
 
-Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of xxGB of memory.
+Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of 8GB of memory.
 
 ## Inference
 A straightforward code for inference is provided in  <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
