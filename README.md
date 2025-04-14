@@ -32,8 +32,7 @@ git clone https://huggingface.co/NewtNewt/MESA
 ## Installation
 
 ```bash
-git clone https://github.com/PaulBorneP/MESA
-cd MESA
+# using python 3.11.12
 pip install -r requirements.txt
 ```
 
