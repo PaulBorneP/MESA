@@ -64,4 +64,4 @@ url={https://arxiv.org/abs/2504.07210},}
 
 This implementation builds upon Hugging Face’s [Diffusers](https://github.com/huggingface/diffusers) library. We also acknowledge [Gradio](https://www.gradio.app/) for providing an easy-to-use interface that allowed us to create the inference demos for our models.
 
-This model is the product of a collaboration between Φ-lab, European Space Agency (ESA) and the Adobe Research (Paris, France).
+This model is the product of a collaboration between [Φ-lab, European Space Agency (ESA)](https://philab.esa.int/) and the [Adobe Research (Paris, France)](https://research.adobe.com/careers/paris/).
