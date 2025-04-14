@@ -30,14 +30,15 @@ git-lfs install
 git clone https://huggingface.co/NewtNewt/MESA
 ```
 ## Installation
-Create a conda environment using the provided environment.yml file
 
 ```bash
-conda env create -n mesa -f environment.yml
-conda activate mesa
+git clone https://github.com/PaulBorneP/MESA
+cd MESA
+pip install -r requirements.txt
 ```
 
 Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of xxGB of memory.
+
 ## Inference
 A straightforward code for inference is provided in  <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
 
@@ -47,7 +48,6 @@ When you run the inference scripts, gradio demos will be hosted on your local ma
 ```bash
 python gradio_demo_mesa.py
 ```
-
 
 ## Citation
 
