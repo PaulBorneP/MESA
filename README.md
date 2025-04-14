@@ -24,11 +24,29 @@ MESA is a novel generative model based on latent denoising diffusion capable of 
 Terrain modeling has traditionally relied on procedural techniques, which often require extensive domain expertise and handcrafted rules. In this paper, we present MESA - a novel data-centric alternative by training a diffusion model on global remote sensing data. This approach leverages large-scale geospatial information to generate high-quality terrain samples from text descriptions, showcasing a flexible and scalable solution for terrain generation. The model’s capabilities are demonstrated through extensive experiments, highlighting its ability to generate realistic and diverse terrain landscapes. The dataset produced to support this work, the Major TOM Core-DEM extension dataset, is released openly as a comprehensive resource for global terrain data. The results suggest that data-driven models, trained on remote sensing data, can provide a powerful tool for realistic terrain modeling and generation.
 
 ## Model Weights
-
-
+You can manually acquire the weights by cloning the models from Hugging Face:
+```bash
+git-lfs install
+git clone https://huggingface.co/NewtNewt/MESA
+```
 ## Installation
+Create a conda environment using the provided environment.yml file
 
+```bash
+conda env create -n mesa -f environment.yml
+conda activate mesa
+```
+
+Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of xxGB of memory.
 ## Inference
+A straightforward code for inference is provided in  <img src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" alt="Open In Colab"/></a> 
+
+Alternatively you can use the Gradio demo.
+When you run the inference scripts, gradio demos will be hosted on your local machine. You can access the demos by opening the URLs (shown in the terminal) in your browser.
+
+```bash
+python gradio_demo_mesa.py
+```
 
 
 ## Citation
