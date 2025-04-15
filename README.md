@@ -6,7 +6,7 @@
 
 <p align="center"><a href="https://sites.google.com/view/morse2025" target="_blank">CVPR 2025 Workshop MORSE</a> </p>
 
-
+[![HF](https://img.shields.io/badge/%F0%9F%8F%94%EF%B8%8FProject%20Page-679c39)](https://paulbornep.github.io/mesa-terrain/)
 [![paper](https://img.shields.io/badge/arXiv-2402.12095-D12424)](https://arxiv.org/abs/2504.07210)
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://www.huggingface.co/NewtNewt/MESA)
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Datasets-yellow)](https://www.huggingface.co/Major-TOM) 
@@ -24,11 +24,13 @@ Terrain modeling has traditionally relied on procedural techniques, which often 
 
 ## Model Weights
 
-You <b>don't need to manually download the model weights</b> when running the inference script. Nevertheless you can still manually acquire the weights by cloning the models from Hugging Face:
+You still manually acquire the weights by cloning the models from Hugging Face:
+
 ```bash
-git-lfs install
-git clone https://huggingface.co/NewtNewt/MESA
+mkdir weights
+huggingface-cli download NewtNewt/MESA --local-dir weights
 ```
+
 ## Installation
 
 ```bash
@@ -39,14 +41,19 @@ pip install -r requirements.txt
 Note that this environment is only compatible with NVIDIA GPUs. Additionally, we recommend using a GPU with a minimum of 8GB of memory.
 
 ## Inference
+
+```python
+from MESA.pipeline_terrain import TerrainDiffusionPipeline
+
+pipe = TerrainDiffusionPipeline.from_pretrained("./weights", torch_dtype=torch.float16)
+pipe.to("cuda");
+
+image,dem = pipe(prompt, num_inference_steps=50, guidance_scale=7.5)
+```
+
 A straightforward code for inference is provided in  <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
 
-Alternatively you can use the Gradio demo.
-When you run the inference scripts, gradio demos will be hosted on your local machine. You can access the demos by opening the URLs (shown in the terminal) in your browser.
-
-```bash
-python gradio_demo_mesa.py
-```
+Alternatively, you can download and use the Gradio demo from the HF page.
 
 ## Citation
 
