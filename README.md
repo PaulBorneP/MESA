@@ -44,6 +44,7 @@ Note that this environment is only compatible with NVIDIA GPUs. Additionally, we
 
 ```python
 from MESA.pipeline_terrain import TerrainDiffusionPipeline
+import torch
 
 pipe = TerrainDiffusionPipeline.from_pretrained("./weights", torch_dtype=torch.float16)
 pipe.to("cuda");
