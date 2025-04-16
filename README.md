@@ -49,6 +49,7 @@ import torch
 pipe = TerrainDiffusionPipeline.from_pretrained("./weights", torch_dtype=torch.float16)
 pipe.to("cuda");
 
+prompt = "A sentinel-2 image of montane forests and mountains in Mexico in August"
 image,dem = pipe(prompt, num_inference_steps=50, guidance_scale=7.5)
 ```
 
