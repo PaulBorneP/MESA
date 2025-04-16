@@ -2,11 +2,6 @@
 # References:
 # https://github.com/huggingface/diffusers/
 ###########################################################################
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -65,12 +60,14 @@ def rescale_noise_cfg(noise_cfg, noise_pred_text, guidance_rescale=0.0):
     Rescale `noise_cfg` according to `guidance_rescale`. Based on findings of [Common Diffusion Noise Schedules and
     Sample Steps are Flawed](https://arxiv.org/pdf/2305.08891.pdf). See Section 3.4
     """
-    std_text = noise_pred_text.std(dim=list(range(1, noise_pred_text.ndim)), keepdim=True)
+    std_text = noise_pred_text.std(
+        dim=list(range(1, noise_pred_text.ndim)), keepdim=True)
     std_cfg = noise_cfg.std(dim=list(range(1, noise_cfg.ndim)), keepdim=True)
     # rescale the results from guidance (fixes overexposure)
     noise_pred_rescaled = noise_cfg * (std_text / std_cfg)
     # mix with the original results from guidance by factor guidance_rescale to avoid "plain looking" images
-    noise_cfg = guidance_rescale * noise_pred_rescaled + (1 - guidance_rescale) * noise_cfg
+    noise_cfg = guidance_rescale * noise_pred_rescaled + \
+        (1 - guidance_rescale) * noise_cfg
     return noise_cfg
 
 
@@ -106,9 +103,11 @@ def retrieve_timesteps(
         second element is the number of inference steps.
     """
     if timesteps is not None and sigmas is not None:
-        raise ValueError("Only one of `timesteps` or `sigmas` can be passed. Please choose one to set custom values")
+        raise ValueError(
+            "Only one of `timesteps` or `sigmas` can be passed. Please choose one to set custom values")
     if timesteps is not None:
-        accepts_timesteps = "timesteps" in set(inspect.signature(scheduler.set_timesteps).parameters.keys())
+        accepts_timesteps = "timesteps" in set(
+            inspect.signature(scheduler.set_timesteps).parameters.keys())
         if not accepts_timesteps:
             raise ValueError(
                 f"The current scheduler class {scheduler.__class__}'s `set_timesteps` does not support custom"
@@ -118,7 +117,8 @@ def retrieve_timesteps(
         timesteps = scheduler.timesteps
         num_inference_steps = len(timesteps)
     elif sigmas is not None:
-        accept_sigmas = "sigmas" in set(inspect.signature(scheduler.set_timesteps).parameters.keys())
+        accept_sigmas = "sigmas" in set(inspect.signature(
+            scheduler.set_timesteps).parameters.keys())
         if not accept_sigmas:
             raise ValueError(
                 f"The current scheduler class {scheduler.__class__}'s `set_timesteps` does not support custom"
@@ -175,9 +175,11 @@ class TerrainDiffusionPipeline(
     """
 
     model_cpu_offload_seq = "text_encoder->image_encoder->unet->vae"
-    _optional_components = ["safety_checker", "feature_extractor", "image_encoder"]
+    _optional_components = ["safety_checker",
+                            "feature_extractor", "image_encoder"]
     _exclude_from_cpu_offload = ["safety_checker"]
-    _callback_tensor_inputs = ["latents", "prompt_embeds", "negative_prompt_embeds"]
+    _callback_tensor_inputs = ["latents",
+                               "prompt_embeds", "negative_prompt_embeds"]
 
     def __init__(
         self,
@@ -202,7 +204,8 @@ class TerrainDiffusionPipeline(
                 " it would be very nice if you could open a Pull request for the `scheduler/scheduler_config.json`"
                 " file"
             )
-            deprecate("steps_offset!=1", "1.0.0", deprecation_message, standard_warn=False)
+            deprecate("steps_offset!=1", "1.0.0",
+                      deprecation_message, standard_warn=False)
             new_config = dict(scheduler.config)
             new_config["steps_offset"] = 1
             scheduler._internal_dict = FrozenDict(new_config)
@@ -215,7 +218,8 @@ class TerrainDiffusionPipeline(
                 " future versions. If you have downloaded this checkpoint from the Hugging Face Hub, it would be very"
                 " nice if you could open a Pull request for the `scheduler/scheduler_config.json` file"
             )
-            deprecate("clip_sample not set", "1.0.0", deprecation_message, standard_warn=False)
+            deprecate("clip_sample not set", "1.0.0",
+                      deprecation_message, standard_warn=False)
             new_config = dict(scheduler.config)
             new_config["clip_sample"] = False
             scheduler._internal_dict = FrozenDict(new_config)
@@ -239,7 +243,8 @@ class TerrainDiffusionPipeline(
         is_unet_version_less_0_9_0 = hasattr(unet.config, "_diffusers_version") and version.parse(
             version.parse(unet.config._diffusers_version).base_version
         ) < version.parse("0.9.0.dev0")
-        is_unet_sample_size_less_64 = hasattr(unet.config, "sample_size") and unet.config.sample_size < 64
+        is_unet_sample_size_less_64 = hasattr(
+            unet.config, "sample_size") and unet.config.sample_size < 64
         if is_unet_version_less_0_9_0 and is_unet_sample_size_less_64:
             deprecation_message = (
                 "The configuration file of the unet has set the default `sample_size` to smaller than"
@@ -252,7 +257,8 @@ class TerrainDiffusionPipeline(
                 " checkpoint from the Hugging Face Hub, it would be very nice if you could open a Pull request for"
                 " the `unet/config.json` file"
             )
-            deprecate("sample_size<64", "1.0.0", deprecation_message, standard_warn=False)
+            deprecate("sample_size<64", "1.0.0",
+                      deprecation_message, standard_warn=False)
             new_config = dict(unet.config)
             new_config["sample_size"] = 64
             unet._internal_dict = FrozenDict(new_config)
@@ -267,9 +273,12 @@ class TerrainDiffusionPipeline(
             feature_extractor=feature_extractor,
             image_encoder=image_encoder,
         )
-        self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
-        self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor)
-        self.register_to_config(requires_safety_checker=requires_safety_checker)
+        self.vae_scale_factor = 2 ** (
+            len(self.vae.config.block_out_channels) - 1)
+        self.image_processor = VaeImageProcessor(
+            vae_scale_factor=self.vae_scale_factor)
+        self.register_to_config(
+            requires_safety_checker=requires_safety_checker)
 
     def _encode_prompt(
         self,
@@ -284,7 +293,8 @@ class TerrainDiffusionPipeline(
         **kwargs,
     ):
         deprecation_message = "`_encode_prompt()` is deprecated and it will be removed in a future version. Use `encode_prompt()` instead. Also, be aware that the output format changed from a concatenated tensor to a tuple."
-        deprecate("_encode_prompt()", "1.0.0", deprecation_message, standard_warn=False)
+        deprecate("_encode_prompt()", "1.0.0",
+                  deprecation_message, standard_warn=False)
 
         prompt_embeds_tuple = self.encode_prompt(
             prompt=prompt,
@@ -299,7 +309,8 @@ class TerrainDiffusionPipeline(
         )
 
         # concatenate for backwards comp
-        prompt_embeds = torch.cat([prompt_embeds_tuple[1], prompt_embeds_tuple[0]])
+        prompt_embeds = torch.cat(
+            [prompt_embeds_tuple[1], prompt_embeds_tuple[0]])
 
         return prompt_embeds
 
@@ -375,13 +386,14 @@ class TerrainDiffusionPipeline(
                 return_tensors="pt",
             )
             text_input_ids = text_inputs.input_ids
-            untruncated_ids = self.tokenizer(prompt, padding="longest", return_tensors="pt").input_ids
+            untruncated_ids = self.tokenizer(
+                prompt, padding="longest", return_tensors="pt").input_ids
 
             if untruncated_ids.shape[-1] >= text_input_ids.shape[-1] and not torch.equal(
                 text_input_ids, untruncated_ids
             ):
                 removed_text = self.tokenizer.batch_decode(
-                    untruncated_ids[:, self.tokenizer.model_max_length - 1 : -1]
+                    untruncated_ids[:, self.tokenizer.model_max_length - 1: -1]
                 )
                 logger.warning(
                     "The following part of your input was truncated because CLIP can only handle sequences up to"
@@ -394,7 +406,8 @@ class TerrainDiffusionPipeline(
                 attention_mask = None
 
             if clip_skip is None:
-                prompt_embeds = self.text_encoder(text_input_ids.to(device), attention_mask=attention_mask)
+                prompt_embeds = self.text_encoder(
+                    text_input_ids.to(device), attention_mask=attention_mask)
                 prompt_embeds = prompt_embeds[0]
             else:
                 prompt_embeds = self.text_encoder(
@@ -408,7 +421,8 @@ class TerrainDiffusionPipeline(
                 # representations. The `last_hidden_states` that we typically use for
                 # obtaining the final prompt representations passes through the LayerNorm
                 # layer.
-                prompt_embeds = self.text_encoder.text_model.final_layer_norm(prompt_embeds)
+                prompt_embeds = self.text_encoder.text_model.final_layer_norm(
+                    prompt_embeds)
 
         if self.text_encoder is not None:
             prompt_embeds_dtype = self.text_encoder.dtype
@@ -417,12 +431,14 @@ class TerrainDiffusionPipeline(
         else:
             prompt_embeds_dtype = prompt_embeds.dtype
 
-        prompt_embeds = prompt_embeds.to(dtype=prompt_embeds_dtype, device=device)
+        prompt_embeds = prompt_embeds.to(
+            dtype=prompt_embeds_dtype, device=device)
 
         bs_embed, seq_len, _ = prompt_embeds.shape
         # duplicate text embeddings for each generation per prompt, using mps friendly method
         prompt_embeds = prompt_embeds.repeat(1, num_images_per_prompt, 1)
-        prompt_embeds = prompt_embeds.view(bs_embed * num_images_per_prompt, seq_len, -1)
+        prompt_embeds = prompt_embeds.view(
+            bs_embed * num_images_per_prompt, seq_len, -1)
 
         # get unconditional embeddings for classifier free guidance
         if do_classifier_free_guidance and negative_prompt_embeds is None:
@@ -447,7 +463,8 @@ class TerrainDiffusionPipeline(
 
             # textual inversion: process multi-vector tokens if necessary
             if isinstance(self, TextualInversionLoaderMixin):
-                uncond_tokens = self.maybe_convert_prompt(uncond_tokens, self.tokenizer)
+                uncond_tokens = self.maybe_convert_prompt(
+                    uncond_tokens, self.tokenizer)
 
             max_length = prompt_embeds.shape[1]
             uncond_input = self.tokenizer(
@@ -473,10 +490,13 @@ class TerrainDiffusionPipeline(
             # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
             seq_len = negative_prompt_embeds.shape[1]
 
-            negative_prompt_embeds = negative_prompt_embeds.to(dtype=prompt_embeds_dtype, device=device)
+            negative_prompt_embeds = negative_prompt_embeds.to(
+                dtype=prompt_embeds_dtype, device=device)
 
-            negative_prompt_embeds = negative_prompt_embeds.repeat(1, num_images_per_prompt, 1)
-            negative_prompt_embeds = negative_prompt_embeds.view(batch_size * num_images_per_prompt, seq_len, -1)
+            negative_prompt_embeds = negative_prompt_embeds.repeat(
+                1, num_images_per_prompt, 1)
+            negative_prompt_embeds = negative_prompt_embeds.view(
+                batch_size * num_images_per_prompt, seq_len, -1)
 
         if self.text_encoder is not None:
             if isinstance(self, StableDiffusionLoraLoaderMixin) and USE_PEFT_BACKEND:
@@ -489,12 +509,15 @@ class TerrainDiffusionPipeline(
         dtype = next(self.image_encoder.parameters()).dtype
 
         if not isinstance(image, torch.Tensor):
-            image = self.feature_extractor(image, return_tensors="pt").pixel_values
+            image = self.feature_extractor(
+                image, return_tensors="pt").pixel_values
 
         image = image.to(device=device, dtype=dtype)
         if output_hidden_states:
-            image_enc_hidden_states = self.image_encoder(image, output_hidden_states=True).hidden_states[-2]
-            image_enc_hidden_states = image_enc_hidden_states.repeat_interleave(num_images_per_prompt, dim=0)
+            image_enc_hidden_states = self.image_encoder(
+                image, output_hidden_states=True).hidden_states[-2]
+            image_enc_hidden_states = image_enc_hidden_states.repeat_interleave(
+                num_images_per_prompt, dim=0)
             uncond_image_enc_hidden_states = self.image_encoder(
                 torch.zeros_like(image), output_hidden_states=True
             ).hidden_states[-2]
@@ -504,7 +527,8 @@ class TerrainDiffusionPipeline(
             return image_enc_hidden_states, uncond_image_enc_hidden_states
         else:
             image_embeds = self.image_encoder(image).image_embeds
-            image_embeds = image_embeds.repeat_interleave(num_images_per_prompt, dim=0)
+            image_embeds = image_embeds.repeat_interleave(
+                num_images_per_prompt, dim=0)
             uncond_image_embeds = torch.zeros_like(image_embeds)
 
             return image_embeds, uncond_image_embeds
@@ -527,37 +551,43 @@ class TerrainDiffusionPipeline(
             for single_ip_adapter_image, image_proj_layer in zip(
                 ip_adapter_image, self.unet.encoder_hid_proj.image_projection_layers
             ):
-                output_hidden_state = not isinstance(image_proj_layer, ImageProjection)
+                output_hidden_state = not isinstance(
+                    image_proj_layer, ImageProjection)
                 single_image_embeds, single_negative_image_embeds = self.encode_image(
                     single_ip_adapter_image, device, 1, output_hidden_state
                 )
 
                 image_embeds.append(single_image_embeds[None, :])
                 if do_classifier_free_guidance:
-                    negative_image_embeds.append(single_negative_image_embeds[None, :])
+                    negative_image_embeds.append(
+                        single_negative_image_embeds[None, :])
         else:
             for single_image_embeds in ip_adapter_image_embeds:
                 if do_classifier_free_guidance:
-                    single_negative_image_embeds, single_image_embeds = single_image_embeds.chunk(2)
+                    single_negative_image_embeds, single_image_embeds = single_image_embeds.chunk(
+                        2)
                     negative_image_embeds.append(single_negative_image_embeds)
                 image_embeds.append(single_image_embeds)
 
         ip_adapter_image_embeds = []
         for i, single_image_embeds in enumerate(image_embeds):
-            single_image_embeds = torch.cat([single_image_embeds] * num_images_per_prompt, dim=0)
+            single_image_embeds = torch.cat(
+                [single_image_embeds] * num_images_per_prompt, dim=0)
             if do_classifier_free_guidance:
-                single_negative_image_embeds = torch.cat([negative_image_embeds[i]] * num_images_per_prompt, dim=0)
-                single_image_embeds = torch.cat([single_negative_image_embeds, single_image_embeds], dim=0)
+                single_negative_image_embeds = torch.cat(
+                    [negative_image_embeds[i]] * num_images_per_prompt, dim=0)
+                single_image_embeds = torch.cat(
+                    [single_negative_image_embeds, single_image_embeds], dim=0)
 
             single_image_embeds = single_image_embeds.to(device=device)
             ip_adapter_image_embeds.append(single_image_embeds)
 
         return ip_adapter_image_embeds
 
-
     def decode_latents(self, latents):
         deprecation_message = "The decode_latents method is deprecated and will be removed in 1.0.0. Please use VaeImageProcessor.postprocess(...) instead"
-        deprecate("decode_latents", "1.0.0", deprecation_message, standard_warn=False)
+        deprecate("decode_latents", "1.0.0",
+                  deprecation_message, standard_warn=False)
 
         latents = 1 / self.vae.config.scaling_factor * latents
         image = self.vae.decode(latents, return_dict=False)[0]
@@ -572,13 +602,15 @@ class TerrainDiffusionPipeline(
         # eta corresponds to η in DDIM paper: https://arxiv.org/abs/2010.02502
         # and should be between [0, 1]
 
-        accepts_eta = "eta" in set(inspect.signature(self.scheduler.step).parameters.keys())
+        accepts_eta = "eta" in set(inspect.signature(
+            self.scheduler.step).parameters.keys())
         extra_step_kwargs = {}
         if accepts_eta:
             extra_step_kwargs["eta"] = eta
 
         # check if the scheduler accepts generator
-        accepts_generator = "generator" in set(inspect.signature(self.scheduler.step).parameters.keys())
+        accepts_generator = "generator" in set(
+            inspect.signature(self.scheduler.step).parameters.keys())
         if accepts_generator:
             extra_step_kwargs["generator"] = generator
         return extra_step_kwargs
@@ -597,7 +629,8 @@ class TerrainDiffusionPipeline(
         callback_on_step_end_tensor_inputs=None,
     ):
         if height % 8 != 0 or width % 8 != 0:
-            raise ValueError(f"`height` and `width` have to be divisible by 8 but are {height} and {width}.")
+            raise ValueError(
+                f"`height` and `width` have to be divisible by 8 but are {height} and {width}.")
 
         if callback_steps is not None and (not isinstance(callback_steps, int) or callback_steps <= 0):
             raise ValueError(
@@ -621,7 +654,8 @@ class TerrainDiffusionPipeline(
                 "Provide either `prompt` or `prompt_embeds`. Cannot leave both `prompt` and `prompt_embeds` undefined."
             )
         elif prompt is not None and (not isinstance(prompt, str) and not isinstance(prompt, list)):
-            raise ValueError(f"`prompt` has to be of type `str` or `list` but is {type(prompt)}")
+            raise ValueError(
+                f"`prompt` has to be of type `str` or `list` but is {type(prompt)}")
 
         if negative_prompt is not None and negative_prompt_embeds is not None:
             raise ValueError(
@@ -666,7 +700,8 @@ class TerrainDiffusionPipeline(
             )
 
         if latents is None:
-            latents = randn_tensor(shape, generator=generator, device=device, dtype=dtype)
+            latents = randn_tensor(
+                shape, generator=generator, device=device, dtype=dtype)
         else:
             latents = latents.to(device)
 
@@ -735,10 +770,10 @@ class TerrainDiffusionPipeline(
     @property
     def interrupt(self):
         return self._interrupt
-    
-    def decode_rgbd(self, latents,generator,output_type="np"):
-        dem_latents = latents[:,4:,:,:]
-        img_latents = latents[:,:4,:,:]
+
+    def decode_rgbd(self, latents, generator, output_type="np"):
+        dem_latents = latents[:, 4:, :, :]
+        img_latents = latents[:, :4, :, :]
         image = self.vae.decode(img_latents / self.vae.config.scaling_factor, return_dict=False, generator=generator)[
             0
         ]
@@ -746,9 +781,11 @@ class TerrainDiffusionPipeline(
             0
         ]
         do_denormalize = [True] * image.shape[0]
-        image = self.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
-        dem = self.image_processor.postprocess(dem, output_type=output_type, do_denormalize=do_denormalize)
-        return image,dem
+        image = self.image_processor.postprocess(
+            image, output_type=output_type, do_denormalize=do_denormalize)
+        dem = self.image_processor.postprocess(
+            dem, output_type=output_type, do_denormalize=do_denormalize)
+        return image, dem
 
     @torch.no_grad()
     @replace_example_docstring(EXAMPLE_DOC_STRING)
@@ -764,7 +801,8 @@ class TerrainDiffusionPipeline(
         negative_prompt: Optional[Union[str, List[str]]] = None,
         num_images_per_prompt: Optional[int] = 1,
         eta: float = 0.0,
-        generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
+        generator: Optional[Union[torch.Generator,
+                                  List[torch.Generator]]] = None,
         latents: Optional[torch.Tensor] = None,
         prompt_embeds: Optional[torch.Tensor] = None,
         negative_prompt_embeds: Optional[torch.Tensor] = None,
@@ -776,7 +814,8 @@ class TerrainDiffusionPipeline(
         guidance_rescale: float = 0.0,
         clip_skip: Optional[int] = None,
         callback_on_step_end: Optional[
-            Union[Callable[[int, int, Dict], None], PipelineCallback, MultiPipelineCallbacks]
+            Union[Callable[[int, int, Dict], None],
+                  PipelineCallback, MultiPipelineCallbacks]
         ] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         **kwargs,
@@ -923,7 +962,8 @@ class TerrainDiffusionPipeline(
 
         # 3. Encode input prompt
         lora_scale = (
-            self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
+            self.cross_attention_kwargs.get(
+                "scale", None) if self.cross_attention_kwargs is not None else None
         )
 
         prompt_embeds, negative_prompt_embeds = self.encode_prompt(
@@ -984,13 +1024,15 @@ class TerrainDiffusionPipeline(
         # 6.2 Optionally get Guidance Scale Embedding
         timestep_cond = None
         if self.unet.config.time_cond_proj_dim is not None:
-            guidance_scale_tensor = torch.tensor(self.guidance_scale - 1).repeat(batch_size * num_images_per_prompt)
+            guidance_scale_tensor = torch.tensor(
+                self.guidance_scale - 1).repeat(batch_size * num_images_per_prompt)
             timestep_cond = self.get_guidance_scale_embedding(
                 guidance_scale_tensor, embedding_dim=self.unet.config.time_cond_proj_dim
             ).to(device=device, dtype=latents.dtype)
 
         # 7. Denoising loop
-        num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
+        num_warmup_steps = len(timesteps) - \
+            num_inference_steps * self.scheduler.order
         self._num_timesteps = len(timesteps)
 #        intermediate_latents = []
         with self.progress_bar(total=num_inference_steps) as progress_bar:
@@ -999,8 +1041,10 @@ class TerrainDiffusionPipeline(
                     continue
 
                 # expand the latents if we are doing classifier free guidance
-                latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
-                latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
+                latent_model_input = torch.cat(
+                    [latents] * 2) if self.do_classifier_free_guidance else latents
+                latent_model_input = self.scheduler.scale_model_input(
+                    latent_model_input, t)
 
                 # predict the noise residual
                 noise_pred = self.unet(
@@ -1016,14 +1060,17 @@ class TerrainDiffusionPipeline(
                 # perform guidance
                 if self.do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                    noise_pred = noise_pred_uncond + self.guidance_scale * (noise_pred_text - noise_pred_uncond)
+                    noise_pred = noise_pred_uncond + self.guidance_scale * \
+                        (noise_pred_text - noise_pred_uncond)
 
                 if self.do_classifier_free_guidance and self.guidance_rescale > 0.0:
                     # Based on 3.4. in https://arxiv.org/pdf/2305.08891.pdf
-                    noise_pred = rescale_noise_cfg(noise_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
+                    noise_pred = rescale_noise_cfg(
+                        noise_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
 
                 # compute the previous noisy sample x_t -> x_t-1
-                scheduler_output = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=True)
+                scheduler_output = self.scheduler.step(
+                    noise_pred, t, latents, **extra_step_kwargs, return_dict=True)
                 latents = scheduler_output.prev_sample
 #                if i % 10 == 0:
 #                   intermediate_latents.append(scheduler_output.pred_original_sample)
@@ -1031,11 +1078,14 @@ class TerrainDiffusionPipeline(
                     callback_kwargs = {}
                     for k in callback_on_step_end_tensor_inputs:
                         callback_kwargs[k] = locals()[k]
-                    callback_outputs = callback_on_step_end(self, i, t, callback_kwargs)
+                    callback_outputs = callback_on_step_end(
+                        self, i, t, callback_kwargs)
 
                     latents = callback_outputs.pop("latents", latents)
-                    prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
-                    negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
+                    prompt_embeds = callback_outputs.pop(
+                        "prompt_embeds", prompt_embeds)
+                    negative_prompt_embeds = callback_outputs.pop(
+                        "negative_prompt_embeds", negative_prompt_embeds)
 
                 # call the callback, if provided
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
@@ -1047,11 +1097,11 @@ class TerrainDiffusionPipeline(
                 if XLA_AVAILABLE:
                     xm.mark_step()
 
-        image,dem = self.decode_rgbd(latents,generator,output_type)
+        image, dem = self.decode_rgbd(latents, generator, output_type)
 
      #   intermediate = [self.decode_rgbd(latent,generator,output_type)for latent in intermediate_latents]
 
         # Offload all models
         self.maybe_free_model_hooks()
 
-        return image,dem
+        return image, dem

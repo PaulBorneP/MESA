@@ -1,67 +1,13 @@
-from torch import nn
-from torch.nn import functional as F
-from diffusers import UNet2DConditionModel
-import torch
+###########################################################################
+# References:
+# https://github.com/huggingface/diffusers/
+###########################################################################
 
-def init_dem_channels(model,conv_in=None,conv_out=None):
-        """
-        Add a channel to the input and output of the model, with 0 initialization
-        """
-        # add one channel to the input and output, with 0 initialization
-        if conv_in is not None:
-            # add a channel to the input of the encoder  
-            pretrained_in_weights = conv_in.weight.clone()
-            pretrained_in_bias = conv_in.bias.clone()
-
-            with torch.no_grad():
-                # weight matrix is of shape (out_channels, in_channels, kernel_size, kernel_size)
-                model.conv_in.weight[:, :4, :, :] = pretrained_in_weights
-                model.conv_in.weight[:, 4:, :, :] = 0
-                # bias vector is of shape (out_channels) no need to change it
-                model.conv_in.bias[...] = pretrained_in_bias
-
-
-
-        if conv_out is not None:
-            # add a channel to the output of the decoder
-            pretrained_out_weights = conv_out.weight.clone()
-            pretrained_out_bias = conv_out.bias.clone()
-
-            with torch.no_grad():
-                # weight matrix is of shape (out_channels, in_channels, kernel_size, kernel_size)
-                model.conv_out.weight[:4, :,  :, :] = pretrained_out_weights
-                model.conv_out.weight[4:, :, :, :] = 0
-                # bias vector is of shape (out_channels) 
-                model.conv_out.bias[:4] = pretrained_out_bias
-                model.conv_out.bias[4:] = 0
-                    # Ensure the new layers are registered
-                model.register_to_config()
-        
-        return model
-
-
-
-
-# Copyright 2024 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
-import torch.utils.checkpoint
-import diffusers
 
 from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.loaders import PeftAdapterMixin, UNet2DConditionLoadersMixin
@@ -95,7 +41,6 @@ from diffusers.models.unets.unet_2d_blocks import (
     get_mid_block,
     get_up_block,
 )
-
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
