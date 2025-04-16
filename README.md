@@ -10,7 +10,7 @@
 [![paper](https://img.shields.io/badge/arXiv-2402.12095-D12424)](https://arxiv.org/abs/2504.07210)
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow)](https://www.huggingface.co/NewtNewt/MESA)
 [![HF](https://img.shields.io/badge/%F0%9F%A4%97-Datasets-yellow)](https://www.huggingface.co/Major-TOM) 
-[![HF](https://img.shields.io/badge/%F0%9F%A4%97-Spaces_Demo-yellow)]()
+[![HF](https://img.shields.io/badge/%F0%9F%A4%97-Spaces_Demo-yellow)](https://huggingface.co/spaces/mikonvergence/MESA)
  <a href="https://colab.research.google.com/drive/1dI8uTzNICpOPTaWmFM9Hhp_n67-Y2m7-?usp=sharing" target="_parent"> <img src="https://colab.research.google.com/assets/colab-badge.svg"  alt="Open In Colab"/></a> 
 
 
